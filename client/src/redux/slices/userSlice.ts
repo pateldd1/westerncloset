@@ -29,7 +29,7 @@ export const loginUser = createAsyncThunk(
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Login failed");
+      if (!response.ok) throw new Error(data.error || "Login failed");
 
       const { token } = data;
       const payload = JSON.parse(atob(token.split(".")[1]));

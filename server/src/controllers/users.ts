@@ -84,7 +84,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     });
     return;
   }
-  console.log(username, email, password);
+
   try {
     const existingUser = await User.queryOne({ email });
     if (existingUser) {

@@ -6,6 +6,7 @@ import logger from "redux-logger";
 import userReducer from "./slices/userSlice";
 import homeListingsReducer from "./slices/homeListings";
 import listingsReducer from "./slices/userListings";
+import reviewsReducer from "./slices/reviews";
 
 const persistConfig = {
   key: "root",
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   homeListings: homeListingsReducer,
   listings: listingsReducer,
+  reviews: reviewsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

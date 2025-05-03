@@ -1,7 +1,10 @@
 import { useState } from 'react'
-import axios from 'axios'
+import { useAppDispatch, useAppSelector } from '../redux/hooks'
+import { createListing } from '../redux/slices/userListings'
 
 const CreateListing = () => {
+  const dispatch = useAppDispatch();
+  const { loading, error } = useAppSelector((state) => state.listings)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
@@ -18,15 +21,12 @@ const CreateListing = () => {
     formData.append('category', category)
     if (image) formData.append('image', image)
 
-    try {
-      const res = await axios.post('http://localhost:5000/api/listings', formData, {
-        headers: { 'Content-Type': 'multipart/form-data', "Authorization": `Bearer ${localStorage.getItem('token')}` },
-      })
-      console.log('✅ Listing created:', res.data)
-      alert('Listing submitted successfully!')
-    } catch (err) {
-      console.error('❌ Error submitting listing:', err)
-      alert('Something went wrong while submitting your listing.')
+    const result = await dispatch(createListing(formData));
+
+    if (createListing.fulfilled.match(result)) {
+      alert("✅ Listing created successfully!");
+    } else {
+      alert("❌ Failed to create listing.");
     }
   }
 
@@ -71,10 +71,11 @@ const CreateListing = () => {
         />
         <button
           type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" disabled={loading}
         >
-          Submit Listing
+          {loading ? "Submitting..." : "Submit Listing"}
         </button>
+        {error && <div className="text-left text-sm text-red-600">{error}</div>}
       </form>
     </div>
   )

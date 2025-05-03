@@ -37,6 +37,29 @@ export const fetchUserListings = createAsyncThunk(
   }
 );
 
+export const createListing = createAsyncThunk(
+  "listings/createListing",
+  async (formData: FormData, { rejectWithValue }) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`${BASE_URL}/api/listings`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create listing");
+
+      return data.data;
+    } catch (err: any) {
+      return rejectWithValue(err.message || "Fetch failed");
+    }
+  }
+);
+
 // ✅ 2. Delete a listing
 export const deleteUserListing = createAsyncThunk(
   "listings/deleteUserListing",
@@ -50,7 +73,7 @@ export const deleteUserListing = createAsyncThunk(
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.message || "Failed to delete");
+        throw new Error(data.error || "Failed to delete");
       }
 
       return id; // return ID so we can remove from state
@@ -79,7 +102,7 @@ export const updateUserListing = createAsyncThunk(
 
       const data = await res.json();
       console.log(data);
-      if (!res.ok) throw new Error(data.message || "Update failed");
+      if (!res.ok) throw new Error(data.error || "Update failed");
 
       return data.listing;
     } catch (err: any) {
@@ -157,6 +180,17 @@ const listingsSlice = createSlice({
         state.selectedListing = action.payload;
       })
       .addCase(fetchListingById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(createListing.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createListing.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(createListing.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
