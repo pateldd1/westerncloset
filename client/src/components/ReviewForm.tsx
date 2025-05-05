@@ -25,7 +25,6 @@ const ReviewForm: React.FC<Props> = ({ sellerId }) => {
       setComment('');
       setSuccess(true);
     } catch (err) {
-        console.error('Error submitting review:', err);
       alert('Failed to submit review');
     } finally {
       setLoading(false);

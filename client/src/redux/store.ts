@@ -7,6 +7,8 @@ import userReducer from "./slices/userSlice";
 import homeListingsReducer from "./slices/homeListings";
 import listingsReducer from "./slices/userListings";
 import reviewsReducer from "./slices/reviews";
+import messagesReducer from "./slices/messages";
+import inboxReducer from "./slices/inbox";
 
 const persistConfig = {
   key: "root",
@@ -19,6 +21,8 @@ const rootReducer = combineReducers({
   homeListings: homeListingsReducer,
   listings: listingsReducer,
   reviews: reviewsReducer,
+  messages: messagesReducer,
+  inbox: inboxReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

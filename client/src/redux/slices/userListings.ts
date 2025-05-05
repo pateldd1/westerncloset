@@ -101,7 +101,6 @@ export const updateUserListing = createAsyncThunk(
       });
 
       const data = await res.json();
-      console.log(data);
       if (!res.ok) throw new Error(data.error || "Update failed");
 
       return data.listing;

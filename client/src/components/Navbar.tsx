@@ -22,6 +22,7 @@ const Navbar: React.FC = () => {
           {token && (
             <>
               <span className="text-gray-300 text-sm">Hello, {username}</span>
+              <Link to="/inbox" className="text-white text-lg hover:text-gray-300">Inbox</Link>
               <Link to="/userListings" className="text-white text-lg hover:text-gray-400">
                 My Listings
               </Link>

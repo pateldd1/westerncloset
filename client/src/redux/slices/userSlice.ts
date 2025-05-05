@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 interface UserState {
+  userId: number | null;
   username: string;
   token: string;
   loading: boolean;
@@ -8,6 +9,7 @@ interface UserState {
 }
 
 const initialState: UserState = {
+  userId: null,
   username: "",
   token: localStorage.getItem("token") || "",
   loading: false,
@@ -34,10 +36,10 @@ export const loginUser = createAsyncThunk(
       const { token } = data;
       const payload = JSON.parse(atob(token.split(".")[1]));
       const username = payload.username;
-
+      const userId = payload.userId;
       localStorage.setItem("token", token);
 
-      return { username, token };
+      return { userId, username, token };
     } catch (err: any) {
       return rejectWithValue(err.message || "Unknown login error");
     }
@@ -64,10 +66,10 @@ export const signupUser = createAsyncThunk(
       const { token } = data;
       const payload = JSON.parse(atob(token.split(".")[1]));
       const username = payload.username;
-
+      const userId = payload.userId;
       localStorage.setItem("token", token);
 
-      return { username, token };
+      return { userId, username, token };
     } catch (err: any) {
       return rejectWithValue(err.message || "Unknown signup error");
     }
@@ -80,6 +82,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
+      state.userId = null;
       state.username = "";
       state.token = "";
       localStorage.removeItem("token");
@@ -94,6 +97,7 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.username = action.payload.username;
+        state.userId = action.payload.userId;
         state.token = action.payload.token;
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -109,6 +113,7 @@ const userSlice = createSlice({
       .addCase(signupUser.fulfilled, (state, action) => {
         state.loading = false;
         state.username = action.payload.username;
+        state.userId = action.payload.userId;
         state.token = action.payload.token;
       })
       .addCase(signupUser.rejected, (state, action) => {

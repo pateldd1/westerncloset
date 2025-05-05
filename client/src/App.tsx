@@ -7,6 +7,9 @@ import ListingDetail from './pages/ListingDetail'
 import Navbar from './components/Navbar'
 import UserListings from './pages/UserListings'
 import ProtectedRoute from './components/ProtectedRoute';
+import MessagingThread from './pages/MessagingThread';
+import Inbox from './pages/Inbox';
+
 import './index.css';
 
 function App() {
@@ -21,13 +24,29 @@ function App() {
           <Route path="/sell" element={<CreateListing />} />
           <Route path="/listings/:id" element={<ListingDetail />} />
           <Route
-          path="/userListings"
-          element={
-            <ProtectedRoute>
-              <UserListings />
-            </ProtectedRoute>
-          }
-        />
+            path="/userListings"
+            element={
+              <ProtectedRoute>
+                <UserListings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/inbox"
+            element={
+              <ProtectedRoute>
+                <Inbox />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages/:listingId"
+            element={
+              <ProtectedRoute>
+                <MessagingThread />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </div>
     </Router>

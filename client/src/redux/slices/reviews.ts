@@ -53,7 +53,7 @@ export const submitReview = createAsyncThunk(
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to submit review");
+      if (!res.ok) throw new Error(data.error || "Failed to submit review");
 
       return data.review;
     } catch (err: any) {

@@ -1,5 +1,5 @@
-import { useParams } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { fetchListingById } from '../redux/slices/userListings';
 import { fetchReviewsBySeller } from '../redux/slices/reviews';
@@ -7,9 +7,12 @@ import ReviewForm from '../components/ReviewForm';
 
 const ListingDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
   const { selectedListing, loading: loadingListings, error } = useAppSelector((state) => state.listings);
   const { reviews, average } = useAppSelector((state) => state.reviews);
+  const { token, userId } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     if (id) {
@@ -18,10 +21,10 @@ const ListingDetail = () => {
   }, [id, dispatch]);
 
   useEffect(() => {
-  if (selectedListing?.seller_id) {
-    dispatch(fetchReviewsBySeller(selectedListing.seller_id));
-  }
-}, [dispatch, selectedListing]);
+    if (selectedListing?.seller_id) {
+      dispatch(fetchReviewsBySeller(selectedListing.seller_id));
+    }
+  }, [dispatch, selectedListing]);
 
   if (loadingListings) return <div className="text-center mt-10 text-lg">Loading...</div>;
   if (error) return <div className="text-center mt-10 text-red-600">{error}</div>;
@@ -63,6 +66,8 @@ const ListingDetail = () => {
           <h2 className="text-lg font-semibold text-gray-900">Description</h2>
           <p className="mt-2 text-gray-700">{selectedListing.description}</p>
         </div>
+
+        {/* Seller Reviews */}
         <div className="mt-10 border-t border-gray-200 pt-6">
           <h2 className="text-lg font-semibold text-gray-900">Seller Reviews</h2>
 
@@ -83,8 +88,22 @@ const ListingDetail = () => {
           </ul>
 
           {/* Inline Review Form */}
-          {selectedListing?.seller_id && <ReviewForm sellerId={selectedListing.seller_id} />}
+          {selectedListing?.seller_id && token && <ReviewForm sellerId={selectedListing.seller_id} />}
         </div>
+
+        {/* CTA to message seller */}
+        {token && selectedListing?.seller_id && selectedListing.seller_id !== userId && (
+          <div className="mt-10">
+            <button
+              onClick={() =>
+                navigate(`/messages/${selectedListing.id}`)
+              }
+              className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            >
+              Message the Seller
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
