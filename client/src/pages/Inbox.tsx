@@ -27,7 +27,7 @@ const Inbox = () => {
             {sellerThreads.map((thread) => (
               <li key={`${thread.listing_id}-${thread.buyer_id}`} className="py-4">
                 <Link
-                  to={`/messages/${thread.listing_id}`}
+                  to={`/messages/${thread.listing_id}/seller`}
                   className="block hover:bg-gray-50 p-4 rounded transition"
                 >
                   <p className="text-sm text-gray-600">
@@ -52,7 +52,7 @@ const Inbox = () => {
             {buyerThreads.map((thread) => (
               <li key={`${thread.listing_id}-${thread.seller_id}`} className="py-4">
                 <Link
-                  to={`/messages/${thread.listing_id}`}
+                  to={`/messages/${thread.listing_id}/buyer`}
                   className="block hover:bg-gray-50 p-4 rounded transition"
                 >
                   <p className="text-sm text-gray-600">

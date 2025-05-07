@@ -40,7 +40,7 @@ function App() {
             }
           />
           <Route
-            path="/messages/:listingId"
+            path="/messages/:listingId/:role"
             element={
               <ProtectedRoute>
                 <MessagingThread />

@@ -25,7 +25,9 @@ export const fetchMessages = createAsyncThunk(
         }
       );
       if (!res.ok) throw new Error("Failed to fetch messages");
-      return await res.json();
+      const thread = await res.json();
+      console.log("Fetched messages:", thread);
+      return thread;
     } catch (err: any) {
       return rejectWithValue(err.message || "Error");
     }

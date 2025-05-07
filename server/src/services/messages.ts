@@ -56,6 +56,7 @@ const MessageService = {
       .join("users as sellers", "listings.seller_id", "sellers.id")
       .where("messages.sender_id", buyerId)
       .whereNot("messages.receiver_id", buyerId) // Only seller messages
+      .whereNot("listings.seller_id", buyerId) // Exclude messages sent by the buyer
       .select(
         "messages.listing_id",
         "messages.receiver_id as seller_id",

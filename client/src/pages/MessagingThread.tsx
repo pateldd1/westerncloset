@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { fetchMessages, sendMessage } from '../redux/slices/messages';
 
 const MessagingThread = () => {
-  const { listingId } = useParams<{ listingId: string }>();
+  const { listingId, role } = useParams<{ listingId: string; role: string }>();
   const dispatch = useAppDispatch();
   const { thread, loading } = useAppSelector((state) => state.messages);
   const { userId } = useAppSelector((state) => state.user);
@@ -41,7 +41,7 @@ const MessagingThread = () => {
             >
               <p className="text-sm">{msg.content}</p>
               <span className="text-xs text-gray-500">
-                {msg.sender_id === userId ? 'You' : 'Seller'} - {new Date(msg.created_at).toLocaleString()}
+                {msg.sender_id === userId ? 'You' : (role === 'buyer'? 'Seller': 'Buyer')} - {new Date(msg.created_at).toLocaleString()}
               </span>
             </div>
           ))
