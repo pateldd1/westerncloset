@@ -53,9 +53,8 @@ export const getListings = async (
   res: Response
 ): Promise<void> => {
   try {
-    // Query the listings from the database
-    const listings: Listing[] = await ListingService.findAll(); // Replace 'listings' with your actual table name
-    res.json(listings); // Send the listings as a JSON response
+    const listings = await ListingService.filterAndFetchListings(req.query);
+    res.json(listings);
   } catch (err) {
     console.error("Error fetching listings:", err);
     res.status(500).json({ message: "Failed to fetch listings" });

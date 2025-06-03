@@ -1,5 +1,5 @@
 import db from "../db/knex";
-import { Listing } from "../types/listings";
+import { Listing, ListingQueryParams } from "../types/listings";
 
 const ListingService = {
   async create(
@@ -11,6 +11,53 @@ const ListingService = {
 
   async findAll(): Promise<Listing[]> {
     return db("listings").select("*");
+  },
+
+  async filterAndFetchListings(params: ListingQueryParams) {
+    let query = db("listings");
+
+    // Search
+    if (params.search) {
+      const term = `%${params.search}%`;
+      query = query.where(function () {
+        this.where("title", "ilike", term).orWhere(
+          "description",
+          "ilike",
+          term
+        );
+      });
+    }
+
+    // Category
+    if (params.category && params.category !== "all") {
+      query = query.andWhere("category", params.category);
+    }
+
+    // Price range
+    if (params.minPrice) {
+      query = query.andWhere("price", ">=", params.minPrice);
+    }
+    if (params.maxPrice) {
+      query = query.andWhere("price", "<=", params.maxPrice);
+    }
+
+    // Sorting
+    switch (params.sort) {
+      case "price-asc":
+        query = query.orderBy("price", "asc");
+        break;
+      case "price-desc":
+        query = query.orderBy("price", "desc");
+        break;
+      case "newest":
+        query = query.orderBy("id", "desc");
+        break;
+      case "oldest":
+        query = query.orderBy("id", "asc");
+        break;
+    }
+
+    return query.select("*");
   },
 
   async findById(id: number): Promise<Listing | undefined> {

@@ -25,7 +25,8 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
-    "pg": "^8.15.5"
+    "pg": "^8.15.5",
+    "stripe": "^18.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",

@@ -13,18 +13,17 @@ const initialState: HomeListingsState = {
   error: null,
 };
 
-export const fetchAllListings = createAsyncThunk(
-  "homeListings/fetchAll",
-  async (_, { rejectWithValue }) => {
+export const fetchFilteredListings = createAsyncThunk(
+  "homeListings/fetchFiltered",
+  async (filters: Record<string, string>, { rejectWithValue }) => {
+    const query = new URLSearchParams(filters).toString();
     try {
-      const res = await fetch("http://localhost:5000/api/listings");
+      const res = await fetch(`http://localhost:5000/api/listings?${query}`);
       const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || "Failed to load listings");
-
+      if (!res.ok) throw new Error(data.message || "Failed to fetch listings");
       return data;
     } catch (err: any) {
-      return rejectWithValue(err.message || "Unknown error fetching listings");
+      return rejectWithValue(err.message || "Unknown error");
     }
   }
 );
@@ -35,15 +34,15 @@ const homeListingsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchAllListings.pending, (state) => {
+      .addCase(fetchFilteredListings.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchAllListings.fulfilled, (state, action) => {
+      .addCase(fetchFilteredListings.fulfilled, (state, action) => {
         state.loading = false;
         state.listings = action.payload;
       })
-      .addCase(fetchAllListings.rejected, (state, action) => {
+      .addCase(fetchFilteredListings.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

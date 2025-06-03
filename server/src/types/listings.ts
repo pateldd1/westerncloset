@@ -12,3 +12,11 @@ export interface Listing {
   buyer_username?: string;
   buyer_email?: string;
 }
+
+export interface ListingQueryParams {
+  search?: string;
+  category?: string;
+  sort?: "price-asc" | "price-desc" | "newest" | "oldest";
+  minPrice?: string;
+  maxPrice?: string;
+}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { fetchAllListings } from '../redux/slices/homeListings';
+import { fetchFilteredListings } from '../redux/slices/homeListings';
 import ListingCard from '../components/ListingCard';
 
 const categories = ['all', 'saree', 'kurti', 'lehenga', 'sherwani'];
@@ -9,24 +9,37 @@ const Home = () => {
   const dispatch = useAppDispatch();
   const { listings, loading, error } = useAppSelector((state) => state.homeListings);
 
-  const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'newest' | 'oldest'>('price-asc');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [search, setSearch] = useState<string>('');
+  const [sort, setSort] = useState<'price-asc' | 'price-desc' | 'newest' | 'oldest'>('price-asc');
+  const [category, setCategory] = useState<string>('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
 
+  // Initial fetch on page load
   useEffect(() => {
-    dispatch(fetchAllListings());
+    dispatch(fetchFilteredListings({}));
   }, [dispatch]);
 
-  const filtered = listings
-    .filter((listing) => categoryFilter === 'all' || listing.category === categoryFilter)
-    .sort((a, b) => {
-      const priceA = parseFloat(a.price.replace(/[^0-9.]/g, ''));
-      const priceB = parseFloat(b.price.replace(/[^0-9.]/g, ''));
-      if (sortBy === 'price-asc') return priceA - priceB;
-      if (sortBy === 'price-desc') return priceB - priceA;
-      if (sortBy === 'newest') return b.id - a.id;
-      if (sortBy === 'oldest') return a.id - b.id;
-      return 0;
-    });
+  // Submit filters manually
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const filters: Record<string, string> = {};
+    if (search) filters.search = search;
+    if (category !== 'all') filters.category = category;
+    if (sort) filters.sort = sort;
+    if (minPrice) filters.minPrice = minPrice;
+    if (maxPrice) filters.maxPrice = maxPrice;
+    dispatch(fetchFilteredListings(filters));
+  };
+
+  const handleClear = () => {
+    setSearch('');
+    setSort('price-asc');
+    setCategory('all');
+    setMinPrice('');
+    setMaxPrice('');
+    dispatch(fetchFilteredListings({}));
+  };
 
   if (loading) return <div className="text-center text-xl">Loading...</div>;
   if (error) return <div className="text-center text-xl text-red-600">{error}</div>;
@@ -35,10 +48,20 @@ const Home = () => {
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <h2 className="text-2xl font-bold tracking-tight text-gray-900">Featured Listings</h2>
-        <div className="flex justify-end mb-6 gap-4">
+
+        {/* Filter Form */}
+        <form onSubmit={handleSubmit} className="flex flex-wrap justify-end gap-4 mb-6">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border px-3 py-2 rounded"
+          />
+
           <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
             className="border rounded-md px-4 py-2 text-gray-700"
           >
             {categories.map((cat) => (
@@ -49,8 +72,8 @@ const Home = () => {
           </select>
 
           <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            value={sort}
+            onChange={(e) => setSort(e.target.value as any)}
             className="border rounded-md px-4 py-2 text-gray-700"
           >
             <option value="price-asc">Price: Low to High</option>
@@ -58,12 +81,32 @@ const Home = () => {
             <option value="newest">Newest</option>
             <option value="oldest">Oldest</option>
           </select>
-        </div>
 
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Apply Filters
+          </button>
+
+          <button
+            type="button"
+            onClick={handleClear}
+            className="text-blue-600 border border-blue-600 px-4 py-2 rounded hover:bg-blue-50"
+          >
+            Clear Filters
+          </button>
+        </form>
+
+        {/* Listings */}
         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-          {filtered.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
-          ))}
+          {listings.length === 0 ? (
+            <p className="text-gray-500 text-lg col-span-full">No listings found.</p>
+          ) : (
+            listings.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))
+          )}
         </div>
       </div>
     </div>

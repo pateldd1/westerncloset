@@ -14,11 +14,13 @@ app.use(express.urlencoded({ extended: true }));
 import listingRoutes from "./routes/listings";
 import userRoutes from "./routes/users";
 import reviewRoutes from "./routes/reviews";
-import MessageRoutes from "./routes/messages";
+import messageRoutes from "./routes/messages";
+import paymentRoutes from "./routes/payments";
 
 app.use("/api/listings", listingRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/reviews", reviewRoutes);
-app.use("/api/messages", MessageRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/payments", paymentRoutes);
 
 export default app;

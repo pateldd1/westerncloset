@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { fetchListingById } from '../redux/slices/userListings';
 import { fetchReviewsBySeller } from '../redux/slices/reviews';
@@ -25,6 +25,28 @@ const ListingDetail = () => {
       dispatch(fetchReviewsBySeller(selectedListing.seller_id));
     }
   }, [dispatch, selectedListing]);
+
+  const handleBuyNow = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/payments/checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ listingId: id }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        window.location.href = data.url; // Redirect to Stripe Checkout
+      } else {
+        alert(data.error || 'Failed to initiate checkout');
+      }
+    } catch (err) {
+      console.error('Stripe Checkout error:', err);
+      alert('Something went wrong');
+    }
+  };
 
   if (loadingListings) return <div className="text-center mt-10 text-lg">Loading...</div>;
   if (error) return <div className="text-center mt-10 text-red-600">{error}</div>;
@@ -66,7 +88,16 @@ const ListingDetail = () => {
           <h2 className="text-lg font-semibold text-gray-900">Description</h2>
           <p className="mt-2 text-gray-700">{selectedListing.description}</p>
         </div>
-
+        {token && (
+          <div className="mt-4">
+            <button
+              onClick={handleBuyNow}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              Buy Now
+            </button>
+          </div>
+        )}
         {/* Seller Reviews */}
         <div className="mt-10 border-t border-gray-200 pt-6">
           <h2 className="text-lg font-semibold text-gray-900">Seller Reviews</h2>
@@ -96,7 +127,7 @@ const ListingDetail = () => {
           <div className="mt-10">
             <button
               onClick={() =>
-                navigate(`/messages/${selectedListing.id}`)
+                navigate(`/messages/${selectedListing.id}/buyer`)
               }
               className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
             >
